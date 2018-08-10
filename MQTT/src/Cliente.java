@@ -7,6 +7,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
+//Falta correcta implementacion!
+
 public class Cliente {
 	
 	private BrokerHandler manejadorB;
