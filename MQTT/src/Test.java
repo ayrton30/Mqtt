@@ -1,31 +1,36 @@
+
 public class Test {
 
 	public static void main(String[] args) {
+		//*Prueba de la clase Configuracion
+		/*Configuracion config = new Configuracion(b1);
+		config.setTopic_sensor("nuevoT/temp", "1");
+		config.setTopic_sensor("nuevoT/LED", "3");*/
 		
-		BrokerHandler handler = new BrokerHandler();
+//Test FINAL:
+		ModeloApp mqttApp = new ModeloApp("ClienteID");
 		
-		Broker b1 = new Broker("tcp://mqtt.fi.mdp.edu.ar", 1883);
-		Broker b2 = new Broker("nuevoHost", 1234);
+		mqttApp.agregarBroker("tcp://mqtt.fi.mdp.edu.ar", 1883);
+		mqttApp.agregarBroker("nuevoHost", -1234);
+		mqttApp.agregarBroker("segundoHost", 1111);
 		
-		handler.agregarBroker(b1);
-		handler.agregarBroker(b2);
-		handler.agregarBroker(new Broker("segundoHost", 5678));
+		//mqttApp.setEstrategiaBinaria(); //Podemos settear la estrategia que usa un archivo binario .dat
 		
-		handler.editarBroker(2, new Broker("tercerHost", 9999));
-		handler.editarBroker(100, b1); //No tiene efecto
+		System.out.println("\n\nImprimimos todos los brokers almacenados:");
+		for(int i=0; i < mqttApp.getBrokers().size(); i++) {
+			System.out.println(i + ") " + mqttApp.getBrokers().get(i).toString());
+		}
 		
-		handler.imprimir();
-		handler.guardarArchivo(); //Guardo un ArrayList de 3 Brokers
+		//Intento suscribirme sin haberme conectado a algun broker antes
+		mqttApp.suscribirse("topic/nuevo");
 		
-		handler.agregarBroker(new Broker("prueba", 6666)); //Agrego un nuevo Broker
-		handler.leerArchivo(); 
-		System.out.println("\nLuego de la lectura:");
-		handler.imprimir();
+		if (mqttApp.conectarse(0) == true) {
+			System.out.println("\nConectado");
+		}
+		//mqttApp.desconectarse();
 		
-		//Prueba de visibilidad
-		Cliente nuevoC = new Cliente();
-		
-		nuevoC.getBrokerHandler().agregarBroker(new Broker("google.com", 1556));
-		nuevoC.getBrokerHandler().imprimir();
+		mqttApp.suscribirse("topic/nuevo");
+		mqttApp.suscribirse("topic/otro");
+		mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
 	}
 }

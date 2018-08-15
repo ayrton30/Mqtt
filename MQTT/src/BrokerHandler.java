@@ -7,24 +7,26 @@ public class BrokerHandler {
 	
 	public BrokerHandler() {
 		this.brokers = new ArrayList<>();
-		//Por defecto se elige la estrategia de archivo de texto
-		this.setEstrategiaTexto();
-	}
-	
-	public void agregarBroker(Broker b) {
-		Broker brokerTemp = new Broker(b.getHost(), b.getPort());
-        brokers.add(brokerTemp);
+		this.setEstrategiaTexto();	//Por defecto se elige la estrategia de archivo de texto
+		
+		//Lee los brokers persistidos!
+		this.leerArchivo();
 	}
 	
 	public void agregarBroker(String host, int port) {
 		Broker brokerTemp = new Broker(host, port);
 		brokers.add(brokerTemp);
+		
+		this.guardarArchivo();
 	}
 	
-	public boolean editarBroker(int i, Broker b) {
+	public boolean editarBroker(int i, String host, int port) {
 		if(i < brokers.size()) {
-			brokers.get(i).setHost(b.getHost());
-			brokers.get(i).setPort(b.getPort());
+			this.brokers.get(i).setHost(host);
+			this.brokers.get(i).setPort(port);
+			
+			this.guardarArchivo();
+			
 			return true;
 		}
 		else {
@@ -35,6 +37,9 @@ public class BrokerHandler {
 	public boolean eliminarBroker(int i) {
 		if(i < brokers.size()) {
 			brokers.remove(i);
+			
+			this.guardarArchivo();
+			
 			return true;
 		}
 		else {
@@ -42,32 +47,37 @@ public class BrokerHandler {
 		}
 	}
 	
+	
+//Polimorfismo respecto a la persistencia de la información
 	public void guardarArchivo() {
-		//Según la estrategia seleccionda (polimorfismo)
-		this.estrategia.guardar(this.brokers);
+		this.estrategia.guardar(this.brokers);	//Según la estrategia seleccionda 
 	}
 	
 	public void leerArchivo() {
-		//Según la estrategia seleccionada
-		 this.brokers = this.estrategia.leer();
+		this.brokers = this.estrategia.leer();	//Según la estrategia seleccionda 
 	}
 	
-	public void imprimir() {
-		Iterator <Broker> i = brokers.iterator();
-		while(i.hasNext()) {
-			System.out.println(i.next().toString());
+	public ArrayList<Broker> getBrokers(){
+		leerArchivo();
+		return(this.brokers);
+	}
+	
+	public Broker getBroker(int i) throws IndexOutOfBoundsException  {
+		try {
+			Broker brokerTemp = brokers.get(i);
+			return brokerTemp;
 		}
-	}
-	
-	public Broker getBroker(int i) {
-		return (this.brokers.get(i));
+		catch (IndexOutOfBoundsException e) {
+			System.out.println("Indice invalido");
+		}
+		return null;
 	}
 	
 	public void setEstrategiaTexto() {
 		this.estrategia = new EstrategiaTexto();
 	}
 	
-	public void setEstrategiaOtra() {
-		this.estrategia = new EstrategiaOtra();
+	public void setEstrategiaBinaria() {
+		this.estrategia = new EstrategiaBinaria();
 	}
 }
