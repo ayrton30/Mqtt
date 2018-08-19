@@ -30,7 +30,7 @@ public class Test {
 		//mqttApp.desconectarse();
 		
 		mqttApp.suscribirse("topic/nuevo");
-		mqttApp.suscribirse("topic/otro");
-		mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
+		//mqttApp.suscribirse("topic/otro");
+		//mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
 	}
 }

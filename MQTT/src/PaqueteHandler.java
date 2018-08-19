@@ -1,130 +1,67 @@
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class PaqueteHandler {
-	private ArrayList<Paquete> paquetes;
+// Funcionalidad: esta clase es la encargada de controlar los paquetes asociados a un broker
+// Clasifica los paquetes según su funcionalidad en dos listas.
+
+public class PaqueteHandler implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private ArrayList<Paquete> paquetesS;	//Lista con todos los paquetes de tipo Suscripción, para usar en SuscribirActivity
+	private ArrayList<Paquete> paquetesP;	//Lista pero con todos los paquetes de tipo Publicación -> PublicarActivity
+	
 	
 	public PaqueteHandler() {
-		this.paquetes = new ArrayList<>();
-		this.paquetes = this.leer();
+		this.paquetesS = new ArrayList<>();
+		this.paquetesP = new ArrayList<>();
 	}
 	
-	//Si ocurre un cambio en un broker, este se edita en todos los paquetes que esten asociados a ese broker
-	public void editarBrokerPaquetes(String host, int port) {
-		Broker brokerTemp = new Broker(host, port);
-		
-		for(int i=0; i<paquetes.size(); i++) {
-			if(paquetes.get(i).getBroker().toString().equals(brokerTemp.toString())) {
-				paquetes.get(i).setBroker(host, port);
-			}
-		}
+	//No va a ser lo mismo generar un paquete para una suscripcion que para una publicacion, ya que tienen diferente funcionalidad
+	public void agregarSuscripcion(String topic) {
+		Paquete pTemp = new Paquete(topic, true);	//TRUE -> Se trata de una suscripción
+		this.paquetesS.add(pTemp);
 	}
 	
-	//Para obtener el indice de un paquete con un topic especifico, un broker.
-	//El boolean indica si estoy buscando paquetes de tipo suscripcion o publicacion
-	public int indicePaquete(String topic, Broker b, boolean esSuscripcion) {
-		int posicion = -1;
-		
-		for(int i = 0; i < paquetes.size(); i++) {
-			if(this.paquetes.get(i).getTopic().equals(topic) && 
-					this.paquetes.get(i).esSuscripcion() == esSuscripcion &&
-					this.paquetes.get(i).getBroker().toString().equals(b.toString())) {
-				posicion = i;
-			}
-		}
-		return posicion;
-	}
-	
-	public void addPaqueteSuscripcion(Broker bActivo, String topic) {
-		Paquete pTemp = new Paquete(bActivo, topic, true);	//TRUE -> Se trata de una suscripción
-		this.paquetes.add(pTemp);
-		
-		//Al haber una modificación en el conjunto de paquetes se realiza un guardado completo.
-		this.guardar(paquetes);
-	}
-	
-	public void addPaquetePublicacion(Broker bActivo, String topic) {
-		Paquete pTemp = new Paquete(bActivo, topic, false);	//FALSE -> Estamos hablando de una publicacion
-		this.paquetes.add(pTemp);
-		
-		//Necesitamos un guardado
-		this.guardar(paquetes);
-	}
-	
-	public Paquete getPaquete(int i) {
-		return this.paquetes.get(i);
-	}
-	
-	public ArrayList<Paquete> getPaquetes(){
-		return this.paquetes;
+	public void agregarPublicacion(String topic) {
+		Paquete pTemp = new Paquete(topic, false);	//FALSE -> Estamos hablando de una publicacion
+		this.paquetesP.add(pTemp);
 	}
 	
 	//Le cambio el topic a un paquete y le borro todos sus mensajes asociados!
-	public void editar(int iPaquete, String topic) {
-		this.paquetes.get(iPaquete).setTopic(topic);
-		this.paquetes.get(iPaquete).limpiarMensajes();
+	public void editarPaquete(int i, String topic, boolean esSuscripcion) {
+		if(esSuscripcion == true) {
+			this.paquetesS.get(i).setTopic(topic);
+			this.paquetesS.get(i).limpiarMensajes();
+		}
+		else {
+			this.paquetesP.get(i).setTopic(topic);
+			this.paquetesP.get(i).limpiarMensajes();
+		}
 	}
-	
-	public void eliminar(int i) {
-		this.paquetes.remove(i);
-		this.guardar(paquetes);
+		
+	public void eliminarPaquete(int i, boolean esSuscripcion) {
+		if(esSuscripcion == true) {
+			this.paquetesS.remove(i);
+		}
+		else {
+			this.paquetesP.remove(i);
+		}
 	}
-	
-	public void eliminar(Broker b) {
-		for(int i=0; i<paquetes.size(); i++) {
-			if(paquetes.get(i).getBroker().toString().equals(b.toString())) {
-				eliminar(i);
-			}
+		
+	public Paquete getPaquete(int i, boolean esSuscripcion) {
+		if(esSuscripcion == true) {
+			return(this.paquetesS.get(i));
+		}
+		else {
+			return(this.paquetesP.get(i));
 		}
 	}
 	
-
-//Metodos de escritura y lectura	
-	public void guardar(ArrayList<Paquete> p) {
-		String fichero = "Paquetes.dat";
-		 
-        try {
-            ObjectOutputStream ficheroSalida = new ObjectOutputStream(new FileOutputStream(fichero));
-            ficheroSalida.writeObject(p);
-            ficheroSalida.flush();
-            ficheroSalida.close();
- 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: El fichero no existe. ");
-        } catch (IOException ioe) {
-            System.out.println("Error: Fallo en la escritura en el fichero. |10|");
-        }
-	}
-	
-
-	public ArrayList<Paquete> leer() {
-		String fichero = "Paquetes.dat";
-		ArrayList<Paquete> paquetesTemp = new ArrayList<>();
-		
-        try {
-        	ObjectInputStream ficheroEntrada = new ObjectInputStream(new FileInputStream(fichero));
-        	ArrayList<Paquete> readObject;
-		
-			readObject = (ArrayList <Paquete>)ficheroEntrada.readObject();
-			 
-			paquetesTemp = readObject;
-            ficheroEntrada.close();
-            
-            return paquetesTemp;
- 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: El fichero no existe. ");
-        } catch (IOException ioe) {
-            System.out.println("Error: Fallo en la escritura en el fichero.|20|");
-        } catch (ClassNotFoundException e) {
-
-			e.printStackTrace();
+	public ArrayList<Paquete> getPaquetes(boolean esSuscripcion){
+		if(esSuscripcion == true) {
+			return(this.paquetesS);
 		}
-        return paquetesTemp;
+		else {
+			return(this.paquetesP);
+		}
 	}
 }

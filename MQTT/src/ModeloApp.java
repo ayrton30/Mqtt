@@ -31,10 +31,8 @@ public class ModeloApp {
 	 * @param port {@code int}
 	 */
 	public void editarBroker(int i, String host, int port) {
-		if(this.clienteFinal.getManejadorB().editarBroker(i, host, port)) {
-			this.clienteFinal.getManejadorP().editarBrokerPaquetes(host, port);
-		}
-		
+		this.clienteFinal.getManejadorB().getBroker(i).setHost(host);
+		this.clienteFinal.getManejadorB().getBroker(i).setPort(port);
 	}
 	
 	/**
@@ -43,10 +41,7 @@ public class ModeloApp {
 	 * @param i posicion del Broker en el Array
 	 */
 	public void eliminarBroker(int i) {
-		if(this.clienteFinal.getManejadorB().eliminarBroker(i)) {
-			this.clienteFinal.getManejadorP().eliminar(this.clienteFinal.getManejadorB().getBroker(i));
-		}
-		
+		this.clienteFinal.getManejadorB().eliminarBroker(i);	
 	}
 	
 	/**
@@ -58,6 +53,14 @@ public class ModeloApp {
 	
 	public Broker getBroker(int i) throws IndexOutOfBoundsException  {
 		return(this.clienteFinal.getManejadorB().getBroker(i));
+	}
+	
+	public ArrayList<Paquete> getSuscripciones(){
+		return(this.clienteFinal.getSuscripciones());
+	}
+	
+	public ArrayList<Paquete> getPublicaciones(){
+		return(this.clienteFinal.getPublicaciones());
 	}
 /*	
 	public void setEstrategiaTexto() {
@@ -92,12 +95,20 @@ public class ModeloApp {
 		this.clienteFinal.addPublicacion(topic, mensaje);
 	}
 	
-	public void editarPaquete(int iPaquete, String topic) {
-		this.clienteFinal.getManejadorP().editar(iPaquete, topic);
+	public boolean editarSuscripcion(int i, String topic) {
+		return(this.clienteFinal.editarSuscripcion(i, topic));
 	}
 	
-	public void eliminarPaquete(int i) {
-		this.clienteFinal.getManejadorP().eliminar(i);
+	public boolean editarPublicacion(int i, String topic) {
+		return(this.clienteFinal.editarPublicacion(i, topic));
+	}
+	
+	public boolean eliminarSuscripcion(int i) {
+		return(this.clienteFinal.eliminarSuscripcion(i));
+	}
+	
+	public boolean eliminarPublicacion(int i) {
+		return(this.clienteFinal.eliminarPublicacion(i));
 	}
 	
 	//Configuracion, necesita el broker al que se debe conectar

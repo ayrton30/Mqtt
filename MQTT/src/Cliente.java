@@ -1,33 +1,63 @@
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
+
+// Funcionalidad: contiene al cliente Paho Mqtt, realiza las conexiones, suscripciones y publicaciones.
 public class Cliente {
-	private BrokerHandler manejadorBroker;
-	private int iBrokerActivo;	//Posicion del Broker al cual se encuentra conectado el cliente
-	private PaqueteHandler manejadorPaquete;	//Conjunto de suscripciones y publicaciones para el cliente actual
 	private MqttClient cliente;
 	private String id_cliente;
+	private BrokerHandler manejadorBrokers;
+	private int iBrokerActivo;	//Posicion del Broker al cual se encuentra conectado el cliente
 	
 	
 	public Cliente(String id) {
-		this.manejadorBroker = new BrokerHandler();
-		this.manejadorPaquete = new PaqueteHandler();
-		this.iBrokerActivo = -1;
+		this.manejadorBrokers = new BrokerHandler();
 		
+		this.iBrokerActivo = -1;	// Aún no existe un broker activo
 		this.id_cliente = id;
 	}
 	
+	public boolean conectarse(int i) {
+		try {
+			Broker brokerTemp = this.manejadorBrokers.getBroker(i);
+			String ServerURI = brokerTemp.toString();
+			
+			cliente = new MqttClient(ServerURI, this.id_cliente);
+			cliente.connect();
+			
+			this.setBrokerActivo(i);
+			
+			return(cliente.isConnected());
+			
+		} catch (MqttException e) {
+			e.printStackTrace();
+		} catch (IndexOutOfBoundsException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	
+	public void desconectarse() {
+		if(cliente.isConnected()) {
+			try {
+				cliente.disconnect();
+				
+			} catch (MqttException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			System.out.println("No hay conexion activa");
+		}
+	}
+	
 	public boolean setBrokerActivo(int i) {
-		if(i < this.manejadorBroker.getBrokers().size()) {
+		if(i < this.manejadorBrokers.getBrokers().size()) {
 			this.iBrokerActivo = i;
 			return true;
 		}
@@ -38,9 +68,9 @@ public class Cliente {
 		}
 	}
 	
-	public Broker getBrokerActivo(int i) {
-		if(i < this.manejadorBroker.getBrokers().size()) {
-			return(this.manejadorBroker.getBroker(i));
+	public Broker getBrokerActivo() {
+		if(this.brokerActivo()) {
+			return(this.manejadorBrokers.getBroker(this.iBrokerActivo));
 		}
 		else {
 			System.out.println("\nIngrese un indice valido");
@@ -57,64 +87,25 @@ public class Cliente {
 			return false;
 		}
 	}
-	
-	public boolean conectarse(int i) {
-		//setBrokerActivo devuelve true si encontro la posicion del broker
-		if(this.setBrokerActivo(i)) {
-			//A partir de la posicion del Broker en el manejador de brokers
-			Broker brokerTemp = this.manejadorBroker.getBroker(i);
-			String ServerURI = brokerTemp.toString();
-			
-			try {
-				cliente = new MqttClient(ServerURI, this.id_cliente);
-				cliente.connect();
-				
-				return(cliente.isConnected());
-				
-			} catch (MqttException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-	
-	
-	public void desconectarse() {
-		if(cliente.isConnected()) {
-			try {
-				cliente.disconnect();
-				
-			} catch (MqttException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else {
-			System.out.println("No hay conexion activa");
-		}
-	}
-	
 		
 //Funcionalidad de los paquetes (Suscripciones|Publicaciones)
 	
 	public void addSuscripcion(String topic) {
-		//Verifico que halla un broker configurado como activo 
-		//y que el paquete que voy a crear ya no exista!
+		//Verifico que halla un broker configurado como activo y que el paquete que voy a crear ya no exista!
 		if(brokerActivo()) {
-			if(manejadorPaquete.indicePaquete(topic, manejadorBroker.getBroker(iBrokerActivo), true) == -1) {
+			
+			if(this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, true) == -1) {
 				//El paquete NO EXISTE, por lo tanto lo creo y almaceno!
-				Broker bActivo = this.manejadorBroker.getBroker(iBrokerActivo);
-				this.manejadorPaquete.addPaqueteSuscripcion(bActivo, topic);	
+				
+				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarSuscripcion(topic);
 			}
 			
 			//Le envio al constructor el manejador de paquetes y el broker activo
-			cliente.setCallback(new MyMqttCallback(manejadorPaquete, manejadorBroker.getBroker(iBrokerActivo)));
+			cliente.setCallback(new MyMqttCallback(this.manejadorBrokers, this.iBrokerActivo));
 			
 			try {
 				cliente.subscribe(topic);
 			} catch (MqttException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -125,9 +116,8 @@ public class Cliente {
 	
 	public void addPublicacion(String topic, String mensaje) {
 		if(brokerActivo()) {
-			if(manejadorPaquete.indicePaquete(topic, manejadorBroker.getBroker(iBrokerActivo), true) == -1) {
-				Broker bActivo = this.manejadorBroker.getBroker(iBrokerActivo);
-				this.manejadorPaquete.addPaquetePublicacion(bActivo, topic);
+			if(this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, true) == -1) {
+				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarPublicacion(topic);
 			}
 			
 			MqttMessage mensaje_publicar = new MqttMessage();
@@ -136,36 +126,77 @@ public class Cliente {
 			try {
 				this.cliente.publish(topic, mensaje_publicar);
 				
-				int posicion = manejadorPaquete.indicePaquete(topic, manejadorBroker.getBroker(iBrokerActivo), false);
-	        	//La posicion del paquete que coinciden con el topic del mensaje recibido
-	        	//Me quedo con el unico paquete de PUBLICACION
+				int posicion = this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, false);
+	        	//Me quedo con la posicion del paquete de PUBLICACION
 	        	
-				manejadorPaquete.getPaquete(posicion).guardarMensaje(mensaje);
-	        	manejadorPaquete.guardar(this.manejadorPaquete.getPaquetes());
+				manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().getPaquete(posicion, true).guardarMensaje(mensaje);
+				manejadorBrokers.guardarArchivo();
 	        	
 	        	System.out.println("Mensaje *" + mensaje + "* publicado!");
 	        	
 			} catch (MqttPersistenceException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (MqttException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		else {
 			System.out.println("\n***Primero conectarse a un broker!***");
 		}
-		
 	}
 	
-//Para podes usar los metodos de estos Handlers desde la clase ModeloApp
+//IMPORTANTE: solo se puede editar, eliminar u obtener paquetes (suscripciones y publicaciones) del broker activo configurado
+	public boolean editarSuscripcion(int i, String topic) {
+		if(brokerActivo()) {
+			this.getBrokerActivo().getManejadorPaquetes().editarPaquete(i, topic, true);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean editarPublicacion(int i, String topic) {
+		if(brokerActivo()) {
+			this.getBrokerActivo().getManejadorPaquetes().editarPaquete(i, topic, false);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean eliminarSuscripcion(int i) {
+		if(brokerActivo()) {
+			this.getBrokerActivo().getManejadorPaquetes().eliminarPaquete(i, true);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean eliminarPublicacion(int i) {
+		if(brokerActivo()) {
+			this.getBrokerActivo().getManejadorPaquetes().eliminarPaquete(i, false);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public ArrayList<Paquete> getSuscripciones(){
+		return(this.getBrokerActivo().getManejadorPaquetes().getPaquetes(true));
+	}
+	
+	public ArrayList<Paquete> getPublicaciones(){
+		return(this.getBrokerActivo().getManejadorPaquetes().getPaquetes(false));
+	}
+	
+//Para podes usar los metodos de este Handlers desde la clase ModeloApp
 	public BrokerHandler getManejadorB() {
-		return(this.manejadorBroker);
+		return(this.manejadorBrokers);
 	}
 	
-	public PaqueteHandler getManejadorP() {
-		return(this.manejadorPaquete);
-	}
-
 }
