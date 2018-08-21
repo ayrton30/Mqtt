@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Test {
 
@@ -8,12 +9,12 @@ public class Test {
 		config.setTopic_sensor("nuevoT/LED", "3");*/
 		
 //Test FINAL:
-		ModeloApp mqttApp = new ModeloApp("ClienteID");
+		/*ModeloApp mqttApp = new ModeloApp("ClienteID");
 		
 		mqttApp.agregarBroker("tcp://mqtt.fi.mdp.edu.ar", 1883);
 		mqttApp.agregarBroker("nuevoHost", -1234);
 		mqttApp.agregarBroker("segundoHost", 1111);
-		
+				
 		//mqttApp.setEstrategiaBinaria(); //Podemos settear la estrategia que usa un archivo binario .dat
 		
 		System.out.println("\n\nImprimimos todos los brokers almacenados:");
@@ -31,6 +32,11 @@ public class Test {
 		
 		mqttApp.suscribirse("topic/nuevo");
 		//mqttApp.suscribirse("topic/otro");
-		//mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
+		//mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");*/
+		
+		ArrayList<String> arreglo = new ArrayList<>();
+		arreglo.add("1");
+		arreglo.add("2");
+		arreglo.get(50);
 	}
 }

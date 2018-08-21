@@ -23,29 +23,16 @@ public class BrokerHandler {
 		this.guardarArchivo();
 	}
 	
-	public boolean editarBroker(int i, String host, int port) {
-		if(i < brokers.size()) {
-			this.brokers.get(i).setHost(host);
-			this.brokers.get(i).setPort(port);
+	public void editarBroker(int i, String host, int port) throws IndexOutOfBoundsException{
+		this.brokers.get(i).setHost(host);
+		this.brokers.get(i).setPort(port);
 			
-			this.guardarArchivo();
-			return true;
-		}
-		else {
-			return false;
-		}
+		this.guardarArchivo();	
 	}
 	
-	public boolean eliminarBroker(int i) {
-		if(i < brokers.size()) {
-			brokers.remove(i);
-			
-			this.guardarArchivo();
-			return true;
-		}
-		else {
-			return false;
-		}
+	public void eliminarBroker(int i) {
+		this.brokers.remove(i);
+		this.guardarArchivo();
 	}
 	
 	public ArrayList<Broker> getBrokers(){
@@ -53,15 +40,9 @@ public class BrokerHandler {
 		return(this.brokers);
 	}
 	
-	public Broker getBroker(int i) throws IndexOutOfBoundsException  {
-		try {
-			Broker brokerTemp = brokers.get(i);
-			return brokerTemp;
-		}
-		catch (IndexOutOfBoundsException e) {
-			System.out.println("Indice invalido");
-		}
-		return null;
+	public Broker getBroker(int i) throws IndexOutOfBoundsException {
+		Broker brokerTemp = brokers.get(i);
+		return brokerTemp;
 	}
 	
 //Polimorfismo respecto a la persistencia de la información!

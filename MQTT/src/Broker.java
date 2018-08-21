@@ -20,16 +20,19 @@ public class Broker implements Serializable {
 	}
 
 	//Setters y Getters
-	public void setHost(String valor) {
+	public boolean setHost(String valor) {
 		this.host = valor;
+		return true;
 	}
 
 	//Se espera un número de puerto positivo
-	public void setPort(int valor) {
+	public boolean setPort(int valor) {
 		if (valor > 0) {
 			this.port = valor;
+			return true;
 		} else {
 			this.port = Math.abs(valor);
+			return false;
 		}
 	}
 
