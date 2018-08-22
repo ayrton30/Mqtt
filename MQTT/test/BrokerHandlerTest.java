@@ -12,7 +12,10 @@ public class BrokerHandlerTest {
 		manejadorB.agregarBroker("nuevoHost", 1883);
 		
 		int resultadoReal = manejadorB.getBrokers().size();
+		
 		assertEquals(resultadoEsperado, resultadoReal);
+		assertEquals("nuevoHost", manejadorB.getBrokers().get(resultadoReal - 1).getHost());
+		assertEquals(1883, manejadorB.getBrokers().get(resultadoReal - 1).getPort());
 	}
 	
 	@Test
