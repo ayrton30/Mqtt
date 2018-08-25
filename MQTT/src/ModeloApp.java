@@ -62,15 +62,23 @@ public class ModeloApp {
 	public ArrayList<Paquete> getPublicaciones(){
 		return(this.clienteFinal.getPublicaciones());
 	}
+	
+	public Paquete getPaqueteSuscripcion(int i) {
+		return(this.clienteFinal.getPaqueteSuscripcion(i));
+	}
+	
+	public Paquete getPaquetePublicacion(int i) {
+		return(this.clienteFinal.getPaquetePublicacion(i));
+	}
 /*	
 	public void setEstrategiaTexto() {
 		this.clienteFinal.getManejadorB().setEstrategiaTexto();
-	}
+	}*/
 	
 	public void setEstrategiaBinaria() {
 		this.clienteFinal.getManejadorB().setEstrategiaBinaria();
 	}
-*/
+
 	
 	public boolean conectarse(int i) {
 		return(this.clienteFinal.conectarse(i));

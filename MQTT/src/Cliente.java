@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -116,7 +117,7 @@ public class Cliente {
 	
 	public void addPublicacion(String topic, String mensaje) {
 		if(brokerActivo()) {
-			if(this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, true) == -1) {
+			if(this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, false) == -1) {
 				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarPublicacion(topic);
 			}
 			
@@ -129,7 +130,7 @@ public class Cliente {
 				int posicion = this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, false);
 	        	//Me quedo con la posicion del paquete de PUBLICACION
 	        	
-				manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().getPaquete(posicion, true).guardarMensaje(mensaje);
+				manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().getPaquete(posicion, false).guardarMensaje(mensaje);
 				manejadorBrokers.guardarArchivo();
 	        	
 	        	System.out.println("Mensaje *" + mensaje + "* publicado!");
@@ -137,6 +138,8 @@ public class Cliente {
 			} catch (MqttPersistenceException e) {
 				e.printStackTrace();
 			} catch (MqttException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -192,6 +195,14 @@ public class Cliente {
 	
 	public ArrayList<Paquete> getPublicaciones(){
 		return(this.getBrokerActivo().getManejadorPaquetes().getPaquetes(false));
+	}
+	
+	public Paquete getPaqueteSuscripcion(int i) {
+		return(this.getBrokerActivo().getManejadorPaquetes().getPaquete(i, true));
+	}
+	
+	public Paquete getPaquetePublicacion(int i) {
+		return(this.getBrokerActivo().getManejadorPaquetes().getPaquete(i, false));
 	}
 	
 //Para podes usar los metodos de este Handlers desde la clase ModeloApp

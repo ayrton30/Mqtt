@@ -9,7 +9,7 @@ public class Test {
 		config.setTopic_sensor("nuevoT/LED", "3");*/
 		
 //Test FINAL:
-		/*ModeloApp mqttApp = new ModeloApp("ClienteID");
+		ModeloApp mqttApp = new ModeloApp("ClienteID");
 		
 		mqttApp.agregarBroker("tcp://mqtt.fi.mdp.edu.ar", 1883);
 		mqttApp.agregarBroker("nuevoHost", -1234);
@@ -32,11 +32,19 @@ public class Test {
 		
 		mqttApp.suscribirse("topic/nuevo");
 		//mqttApp.suscribirse("topic/otro");
-		//mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");*/
+		mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
 		
-		ArrayList<String> arreglo = new ArrayList<>();
-		arreglo.add("1");
-		arreglo.add("2");
-		arreglo.get(50);
+		for(int i=150 ; i < 170; i++) {
+			String mensaje = String.valueOf(i);
+			
+			mqttApp.publicar("topic/numero", mensaje);
+		}
+		
+		ArrayList<Paquete> pub = mqttApp.getPublicaciones();
+		for(int i=0; i<pub.size(); i++) {
+			System.out.println("PaquetePublicacion[" + i + "] " + pub.get(i).getTopic());
+		}
+		pub.get(9).imprimirMensajes();	//Tambien se podria usar el metodo del paquete 'ArrayList<String> getMensajes()'
+		
 	}
 }

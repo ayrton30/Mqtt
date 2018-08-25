@@ -9,47 +9,36 @@ import java.util.ArrayList;
 public class EstrategiaBinaria implements EstrategiaArchivo{
 
 	@Override
-	public void guardar(ArrayList<Broker> b) {
+	public void guardar(ArrayList<Broker> b) throws IOException, FileNotFoundException {
 		String fichero = "Brokers.dat";
 		 
-        try {
-            ObjectOutputStream ficheroSalida = new ObjectOutputStream(new FileOutputStream(fichero));
-            ficheroSalida.writeObject(b);
-            ficheroSalida.flush();
-            ficheroSalida.close();
- 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: El fichero no existe. ");
-        } catch (IOException ioe) {
-            System.out.println("Error: Fallo en la escritura en el fichero. ");
-        }
+		ObjectOutputStream ficheroSalida = new ObjectOutputStream(new FileOutputStream(fichero));
+        ficheroSalida.writeObject(b);
+        ficheroSalida.flush();
+        ficheroSalida.close();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<Broker> leer() {
+	public ArrayList<Broker> leer() throws IOException, FileNotFoundException {
 		String fichero = "Brokers.dat";
 		ArrayList<Broker> brokersTemp = new ArrayList<>();
 		
-        try {
-        	ObjectInputStream ficheroEntrada = new ObjectInputStream(new FileInputStream(fichero));
-        	ArrayList<Broker> readObject;
+        ObjectInputStream ficheroEntrada = new ObjectInputStream(new FileInputStream(fichero));
+        ArrayList<Broker> readObject;
 		
-			readObject = (ArrayList <Broker>) ficheroEntrada.readObject();
+        try {
+        	readObject = (ArrayList <Broker>) ficheroEntrada.readObject();
 			 
-			brokersTemp = readObject;
+    		brokersTemp = readObject;
             ficheroEntrada.close();
-            
-            return brokersTemp;
- 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: El fichero no existe. ");
-        } catch (IOException ioe) {
-            System.out.println("Error: Fallo en la escritura en el fichero. ");
+        
         } catch (ClassNotFoundException e) {
 
 			e.printStackTrace();
 		}
-		return brokersTemp;
+        
+        return brokersTemp;
 	}
 
 }
