@@ -30,21 +30,32 @@ public class Test {
 		}
 		//mqttApp.desconectarse();
 		
+//Prueba de suscripcion y guardado correcto de los mensajes
 		mqttApp.suscribirse("topic/nuevo");
-		//mqttApp.suscribirse("topic/otro");
-		mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
+		mqttApp.suscribirse("topic/otro");
 		
-		for(int i=150 ; i < 170; i++) {
+		ArrayList<Paquete> sus = mqttApp.getSuscripciones();
+		System.out.println("Cantidad de publicaciones en topics diferentes: " + sus.size());
+		for(int i=0; i<sus.size(); i++) {
+			System.out.println("PaqueteSuscripcion[" + i + "] " + sus.get(i).getTopic());
+		}
+		sus.get(0).imprimirMensajes();	//Mensajes almacenados para la suscripcion del topic: topic/nuevo
+		sus.get(1).imprimirMensajes();	//Lo mismo pero para el topic: topic/otro
+		
+//Prueba de publicacion
+		//mqttApp.publicar("topic/temp", "{Temp: 25.6° C}");
+		for(int i=0; i < 100; i++) {
 			String mensaje = String.valueOf(i);
 			
 			mqttApp.publicar("topic/numero", mensaje);
 		}
 		
-		ArrayList<Paquete> pub = mqttApp.getPublicaciones();
+		ArrayList<Paquete> pub = mqttApp.getPublicaciones();	//Obtengo todos los paquetes de publicaciones asociados al brokerActivo(con sus diferentes topics)
+		System.out.println("Cantidad de publicaciones en topics diferentes: " + pub.size());
 		for(int i=0; i<pub.size(); i++) {
 			System.out.println("PaquetePublicacion[" + i + "] " + pub.get(i).getTopic());
 		}
-		pub.get(9).imprimirMensajes();	//Tambien se podria usar el metodo del paquete 'ArrayList<String> getMensajes()'
+		pub.get(0).imprimirMensajes();	//Tambien se podria usar el metodo del paquete 'ArrayList<String> getMensajes()'
 		
 	}
 }
