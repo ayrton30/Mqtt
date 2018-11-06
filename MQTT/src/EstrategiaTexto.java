@@ -9,9 +9,9 @@ import java.util.ArrayList;
 public class EstrategiaTexto implements EstrategiaArchivo{
 
 	@Override
-	public void guardar(ArrayList<Broker> b) {
+	public void guardar(ArrayList<Broker> b, String path) {
 		// TODO Auto-generated method stub
-		File archivo = new File("Brokers.txt");
+		File archivo = new File(path);
 		
 		FileOutputStream salida = null;
         ObjectOutputStream writer = null;
@@ -39,9 +39,9 @@ public class EstrategiaTexto implements EstrategiaArchivo{
 	}
 
 	@Override
-	public ArrayList<Broker> leer() {
+	public ArrayList<Broker> leer(String path) {
 		// TODO Auto-generated method stub
-		File archivo = new File("Brokers.txt");
+		File archivo = new File(path);
 		
 		FileInputStream entrada = null;
         ObjectInputStream reader = null;

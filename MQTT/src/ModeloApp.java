@@ -1,6 +1,10 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ModeloApp {
+public class ModeloApp implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private Cliente clienteFinal;
 	private Configuracion config;
 	
@@ -8,8 +12,8 @@ public class ModeloApp {
 	 * Crea un objeto de tipo ModeloApp que corresponde a la entrada de la aplicacion Android.
 	 * @param id_client es el nombre identificación del cliente en la conexión
 	 */
-	public ModeloApp(String id_client) {
-		this.clienteFinal = new Cliente(id_client); //ClienteID:string por defecto
+	public ModeloApp(String id_client, String path) {
+		this.clienteFinal = new Cliente(id_client, path); //ClienteID:string por defecto
 		this.config = new Configuracion();
 	}
 	
@@ -19,8 +23,8 @@ public class ModeloApp {
 	 * @param  host {@code String}
 	 * @param  port {@code int}
 	 */
-	public void agregarBroker(String host, int port) {
-		this.clienteFinal.getManejadorB().agregarBroker(host, port);
+	public void agregarBroker(String nombre, String host, int port) {
+		this.clienteFinal.getManejadorB().agregarBroker(nombre, host, port);
 	}
 	
 	/**
@@ -78,6 +82,10 @@ public class ModeloApp {
 	public void setEstrategiaBinaria() {
 		this.clienteFinal.getManejadorB().setEstrategiaBinaria();
 	}
+	
+	public void setManejadorListener(MensajeEventListener listener) {
+		this.clienteFinal.setManejadorEventListener(listener);
+	}
 
 	
 	public boolean conectarse(int i) {
@@ -88,6 +96,10 @@ public class ModeloApp {
 		this.clienteFinal.desconectarse();
 	}
 	
+	public void guardarBrokers() throws FileNotFoundException, IOException {
+		this.clienteFinal.getManejadorB().guardarArchivo();
+	}
+	
 	/**
 	 * Suscribe con los datos del Broker activo en el topic
 	 * que se pasa como argumento
@@ -95,12 +107,12 @@ public class ModeloApp {
 	 */
 	
 	//Posicion del broker a utilizar y topic
-	public void suscribirse(String topic) {
-		this.clienteFinal.addSuscripcion(topic);
+	public void suscribirse(String nombre, String topic) {
+		this.clienteFinal.addSuscripcion(nombre, topic);
 	}
 	
-	public void publicar(String topic, String mensaje) {
-		this.clienteFinal.addPublicacion(topic, mensaje);
+	public void publicar(String nombre, String topic, String mensaje) {
+		this.clienteFinal.addPublicacion(nombre, topic, mensaje);
 	}
 	
 	public boolean editarSuscripcion(int i, String topic) {

@@ -8,8 +8,8 @@ public class PaqueteTest {
 	
 	@Test
 	public void testPaquete() {
-		paquete1 = new Paquete("topic/prueba/sus", true);	//Paquete de suscripción
-		paquete2 = new Paquete("topic/prueba/pub", false);	//Paquete de publicación
+		paquete1 = new Paquete("name_default", "topic/prueba/sus", true);	//Paquete de suscripción
+		paquete2 = new Paquete("name_default", "topic/prueba/pub", false);	//Paquete de publicación
 		
 		String resultadoEsperadoSus_1 = "topic/prueba/sus";	boolean resultadoEsperadoSus_2 = true;
 		String resultadoEsperadoPub_1 = "topic/prueba/pub";	boolean resultadoEsperadoPub_2 = false;
@@ -22,7 +22,7 @@ public class PaqueteTest {
 
 	@Test
 	public void testGuardarMensaje() {
-		paquete1 = new Paquete("topic/prueba/sus", true);
+		paquete1 = new Paquete("name_default", "topic/prueba/sus", true);
 		
 		for(int i=0; i<100; i++) {
 			String mensaje = String.valueOf(i);
@@ -41,7 +41,7 @@ public class PaqueteTest {
 
 	@Test
 	public void testLimpiarMensajes() {
-		paquete1 = new Paquete("topic/prueba/sus", true);
+		paquete1 = new Paquete("name_default", "topic/prueba/sus", true);
 		
 		for(int i=0; i<100; i++) {
 			String mensaje = String.valueOf(i);

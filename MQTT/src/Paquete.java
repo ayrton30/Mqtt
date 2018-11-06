@@ -9,12 +9,14 @@ public class Paquete implements Serializable{
 	
 	private boolean esSuscripcion;	//Indica si el paquete se trata de una suscripcion o publicacion
 	private String topic;
+	private String nombre;
 	private ArrayList<String> mensajes; //Coleccion de mensajes que llegan del topic como mensajes
 										//o que son enviados a un topic especifico como publicación
 	
 //Paquete preparado para una suscripción o publicación
-	public Paquete(String topic, boolean esSuscripcion) {
+	public Paquete(String nombre, String topic, boolean esSuscripcion) {
 		this.setTopic(topic);
+		this.setNombre(nombre);
 		this.esSuscripcion = esSuscripcion;		//No hay un set_esSuscripcion(boolean) debido a que este valor no deberia cambiar en ningun momento
 		this.mensajes = new ArrayList<>();
 	}
@@ -25,6 +27,14 @@ public class Paquete implements Serializable{
 	
 	public String getTopic() {
 		return(this.topic);
+	}
+	
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	
+	public String getNombre() {
+		return(this.nombre);
 	}
 	
 	//Indica si el paquete se trata de una suscripcion. 

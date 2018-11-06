@@ -4,12 +4,12 @@ import org.junit.Test;
 
 public class BrokerHandlerTest {
 
-	BrokerHandler manejadorB = new BrokerHandler();
+	BrokerHandler manejadorB = new BrokerHandler("Brokers.txt");
 	
 	@Test
 	public void testAgregarBroker() {
 		int resultadoEsperado = manejadorB.getBrokers().size() + 1;
-		manejadorB.agregarBroker("nuevoHost", 1883);
+		manejadorB.agregarBroker("name_TEST", "nuevoHost", 1883);
 		
 		int resultadoReal = manejadorB.getBrokers().size();
 		
@@ -20,8 +20,8 @@ public class BrokerHandlerTest {
 	
 	@Test
 	public void testEditarBroker1() {
-		Broker resultadoEsperado = new Broker("editarHost", 1883);
-		manejadorB.agregarBroker("nuevoHost", 1883);
+		Broker resultadoEsperado = new Broker("name_TEST", "editarHost", 1883);
+		manejadorB.agregarBroker("name_TEST", "nuevoHost", 1883);
 		
 		manejadorB.editarBroker(0, resultadoEsperado.getHost(), resultadoEsperado.getPort());
 		Broker resultadoReal = manejadorB.getBroker(0);
@@ -33,7 +33,7 @@ public class BrokerHandlerTest {
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testEditarBroker2() {
 		//Tengo 2 brokers y quiero editar un broker inexistente (indice)
-		manejadorB.agregarBroker("primerHost", 1883);
+		manejadorB.agregarBroker("name_TEST", "primerHost", 1883);
 		manejadorB.editarBroker(-10, "nuevoHost", 9999);
 	}
 	
@@ -53,8 +53,8 @@ public class BrokerHandlerTest {
 	
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testGetBroker() {
-		BrokerHandler manejadorB = new BrokerHandler();
-		manejadorB.agregarBroker("primerHost", 1883);
+		BrokerHandler manejadorB = new BrokerHandler("Brokers.txt");
+		manejadorB.agregarBroker("name_TEST", "primerHost", 1883);
 		manejadorB.getBroker(9999);
 	}
 

@@ -7,13 +7,15 @@ import java.util.ArrayList;
 
 public class Broker implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private String nombre;
 	private String host;
 	private int port;
 	private PaqueteHandler manejadorPaquetes;
 	
 	
 	//Constructor
-	public Broker(String h, int p) {
+	public Broker(String n, String h, int p) {
+		setNombre(n);
 		setHost(h);
 		setPort(p);
 		this.manejadorPaquetes = new PaqueteHandler();
@@ -22,6 +24,11 @@ public class Broker implements Serializable {
 	//Setters y Getters
 	public boolean setHost(String valor) {
 		this.host = valor;
+		return true;
+	}
+	
+	public boolean setNombre(String valor) {
+		this.nombre = valor;
 		return true;
 	}
 
@@ -42,6 +49,10 @@ public class Broker implements Serializable {
 
 	public int getPort() {
 		return(this.port);
+	}
+	
+	public String getNombre() {
+		return(this.nombre);
 	}
 	
 	public PaqueteHandler getManejadorPaquetes() {

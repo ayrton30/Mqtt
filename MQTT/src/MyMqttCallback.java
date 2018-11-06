@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -6,10 +8,13 @@ public class MyMqttCallback implements MqttCallback {
 
 	private BrokerHandler manejadorBrokers;
 	private int iBrokerActivo;	//Posición del broker activo
+	private MensajeEventListener listener;
 	
-	public MyMqttCallback(BrokerHandler manejador, int i) {
+	
+	public MyMqttCallback(BrokerHandler manejador, int i, MensajeEventListener listener) {
 		this.manejadorBrokers = manejador;
 		this.iBrokerActivo = i;
+		this.listener = listener;	
 	}
 	
 	@Override
@@ -32,10 +37,14 @@ public class MyMqttCallback implements MqttCallback {
 		
 		this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().getPaquete(posicion, true).guardarMensaje(Mensaje.toString());
 		this.manejadorBrokers.guardarArchivo();
+		
+		MensajeEventObject obj = new MensajeEventObject(this, Mensaje.toString());
+		listener.MensajeRecibido(obj);
    		
     	//Para imprimir todos los mensajes de un paquete
 		//this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().getPaquete(posicion, true).imprimirMensajes();
         
-		System.out.println(Mensaje.toString());	
+		//System.out.println(Mensaje.toString());	//OJO!, implementado en el evento de mensaje
 	}
+
 }

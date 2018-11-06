@@ -9,7 +9,7 @@ public class PaqueteHandlerTest {
 	@Test
 	public void testAgregarSuscripcion() {
 		int resultadoEsperado = manejadorP.getPaquetes(true).size() + 1;
-		manejadorP.agregarSuscripcion("topic/test");
+		manejadorP.agregarSuscripcion("name_default", "topic/test");
 		
 		int resultadoReal = manejadorP.getPaquetes(true).size();
 		
@@ -21,7 +21,7 @@ public class PaqueteHandlerTest {
 	@Test
 	public void testAgregarPublicacion() {
 		int resultadoEsperado = manejadorP.getPaquetes(false).size() + 1;
-		manejadorP.agregarPublicacion("topic/test");
+		manejadorP.agregarPublicacion("name_default", "topic/test");
 		
 		int resultadoReal = manejadorP.getPaquetes(false).size();
 		
@@ -33,7 +33,7 @@ public class PaqueteHandlerTest {
 	@Test
 	public void testEditarPaquete1() {
 		//Trabajamos con un paquete suscripcion -> esSuscripcion() = true
-		manejadorP.agregarSuscripcion("topic/test");
+		manejadorP.agregarSuscripcion("name_default", "topic/test");
 		
 		String resultadoEsperado1 = "topic/editar";
 		boolean resultadoEsperado2 = true;
@@ -49,7 +49,7 @@ public class PaqueteHandlerTest {
 	public void testEditarPaquete2() {
 		//Tengo 50 paquetes y quiero editar un paquete inexistente (indice)
 		for(int i=0; i<50; i++) {
-			manejadorP.agregarPublicacion("topic/test");
+			manejadorP.agregarPublicacion("name_default", "topic/test");
 		}
 		manejadorP.editarPaquete(-10, "topic/nuevo", false);
 	}
@@ -57,8 +57,8 @@ public class PaqueteHandlerTest {
 	@Test
 	public void testEliminarPaquete1() {
 		for(int i=0; i<10; i++) {
-			manejadorP.agregarSuscripcion("topic/test");
-			manejadorP.agregarPublicacion("topic/test");
+			manejadorP.agregarSuscripcion("name_default", "topic/test");
+			manejadorP.agregarPublicacion("name_default", "topic/test");
 		}
 		
 		int resultadoEsperado1 = manejadorP.getPaquetes(true).size() - 1;
@@ -81,7 +81,7 @@ public class PaqueteHandlerTest {
 	@Test
 	public void testGetPaquete() {
 		String resultadoEsperado = "topic/pub";
-		manejadorP.agregarPublicacion(resultadoEsperado);
+		manejadorP.agregarPublicacion("name_default", resultadoEsperado);
 		
 		int resultadoReal = manejadorP.getPaquetes(false).size();
 		

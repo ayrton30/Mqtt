@@ -9,8 +9,8 @@ import java.util.ArrayList;
 public class EstrategiaBinaria implements EstrategiaArchivo{
 
 	@Override
-	public void guardar(ArrayList<Broker> b) throws IOException, FileNotFoundException {
-		String fichero = "Brokers.dat";
+	public void guardar(ArrayList<Broker> b, String path) throws IOException, FileNotFoundException {
+		String fichero = path;
 		 
 		ObjectOutputStream ficheroSalida = new ObjectOutputStream(new FileOutputStream(fichero));
         ficheroSalida.writeObject(b);
@@ -20,8 +20,8 @@ public class EstrategiaBinaria implements EstrategiaArchivo{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<Broker> leer() throws IOException, FileNotFoundException {
-		String fichero = "Brokers.dat";
+	public ArrayList<Broker> leer(String path) throws IOException, FileNotFoundException {
+		String fichero = path;
 		ArrayList<Broker> brokersTemp = new ArrayList<>();
 		
         ObjectInputStream ficheroEntrada = new ObjectInputStream(new FileInputStream(fichero));

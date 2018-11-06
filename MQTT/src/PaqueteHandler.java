@@ -15,14 +15,15 @@ public class PaqueteHandler implements Serializable {
 		this.paquetesP = new ArrayList<>();
 	}
 	
+	
 	//No va a ser lo mismo generar un paquete para una suscripcion que para una publicacion, ya que tienen diferente funcionalidad
-	public void agregarSuscripcion(String topic) {
-		Paquete pTemp = new Paquete(topic, true);	//TRUE -> Se trata de una suscripción
+	public void agregarSuscripcion(String nombre, String topic) {
+		Paquete pTemp = new Paquete(nombre, topic, true);	//TRUE -> Se trata de una suscripción
 		this.paquetesS.add(pTemp);
 	}
 	
-	public void agregarPublicacion(String topic) {
-		Paquete pTemp = new Paquete(topic, false);	//FALSE -> Estamos hablando de una publicacion
+	public void agregarPublicacion(String nombre, String topic) {
+		Paquete pTemp = new Paquete(nombre, topic, false);	//FALSE -> Estamos hablando de una publicacion
 		this.paquetesP.add(pTemp);
 	}
 	
@@ -64,4 +65,6 @@ public class PaqueteHandler implements Serializable {
 			return(this.paquetesP);
 		}
 	}
+
+
 }

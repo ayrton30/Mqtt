@@ -8,11 +8,17 @@ import java.util.ArrayList;
 public class BrokerHandler {
 	private ArrayList<Broker> brokers;
 	private EstrategiaArchivo estrategia;	// -> Patrón de estrategia
+	private String path;
 	
+	public void setPath(String p) {
+		this.path = p;
+	}
 	
-	public BrokerHandler() {
+	public BrokerHandler(String path) {
 		this.brokers = new ArrayList<>();
 		this.setEstrategiaTexto();	//Por defecto se elige la estrategia de archivo de texto
+
+		this.setPath(path);
 		
 	//Lee los brokers persistidos!
 		try {
@@ -23,8 +29,8 @@ public class BrokerHandler {
 		}
 	}
 	
-	public void agregarBroker(String host, int port) {
-		Broker brokerTemp = new Broker(host, port);
+	public void agregarBroker(String nombre, String host, int port) {
+		Broker brokerTemp = new Broker(nombre, host, port);
 		brokers.add(brokerTemp);
 		
 		try {
@@ -74,13 +80,13 @@ public class BrokerHandler {
 		//El método guardar recibe como parámetro el ArrayList que se desea guardar en un archivo.
 		//Según la estrategia seleccionado se guardara en un .txt o .dat
 		
-		this.estrategia.guardar(this.brokers);	//Según la estrategia seleccionda 
+		this.estrategia.guardar(this.brokers, this.path);	//Según la estrategia seleccionda 
 	}
 	
 	public void leerArchivo() throws FileNotFoundException, IOException {
 		//El método leer devuelve un objeto de tipo ArrayList<Broker> con los datos obtenidos del archivo Brokers.txt
 		//o Brokers.dat según la estrategia seleccionda
-		this.brokers = this.estrategia.leer();	//Según la estrategia seleccionda 
+		this.brokers = this.estrategia.leer(this.path);	//Según la estrategia seleccionda 
 	}
 	
 	public void setEstrategiaTexto() {

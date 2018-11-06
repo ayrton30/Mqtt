@@ -14,9 +14,11 @@ public class Cliente {
 	private BrokerHandler manejadorBrokers;
 	private int iBrokerActivo;	//Posicion del Broker al cual se encuentra conectado el cliente
 	
+	private MensajeEventListener manejadorEvento;
 	
-	public Cliente(String id) {
-		this.manejadorBrokers = new BrokerHandler();
+	
+	public Cliente(String id, String path) {
+		this.manejadorBrokers = new BrokerHandler(path);
 		
 		this.iBrokerActivo = -1;	// Aún no existe un broker activo
 		this.id_cliente = id;
@@ -91,18 +93,18 @@ public class Cliente {
 		
 //Funcionalidad de los paquetes (Suscripciones|Publicaciones)
 	
-	public void addSuscripcion(String topic) {
+	public void addSuscripcion(String nombre, String topic) {
 		//Verifico que halla un broker configurado como activo y que el paquete que voy a crear ya no exista!
 		if(brokerActivo()) {
 			
 			if(this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, true) == -1) {
 				//El paquete NO EXISTE, por lo tanto lo creo y almaceno!
 				
-				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarSuscripcion(topic);
+				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarSuscripcion(nombre, topic);
 			}
 			
 			//Le envio al constructor el manejador de paquetes y el broker activo
-			cliente.setCallback(new MyMqttCallback(this.manejadorBrokers, this.iBrokerActivo));
+			cliente.setCallback(new MyMqttCallback(this.manejadorBrokers, this.iBrokerActivo, this.manejadorEvento));
 			
 			try {
 				cliente.subscribe(topic);
@@ -115,10 +117,10 @@ public class Cliente {
 		}
      }
 	
-	public void addPublicacion(String topic, String mensaje) {
+	public void addPublicacion(String nombre, String topic, String mensaje) {
 		if(brokerActivo()) {
 			if(this.manejadorBrokers.getBroker(iBrokerActivo).indicePaquete(topic, false) == -1) {
-				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarPublicacion(topic);
+				this.manejadorBrokers.getBroker(iBrokerActivo).getManejadorPaquetes().agregarPublicacion(nombre, topic);
 			}
 			
 			MqttMessage mensaje_publicar = new MqttMessage();
@@ -208,6 +210,17 @@ public class Cliente {
 //Para podes usar los metodos de este Handlers desde la clase ModeloApp
 	public BrokerHandler getManejadorB() {
 		return(this.manejadorBrokers);
+	}
+	
+//Para el manejador de eventos!
+	public MensajeEventListener getManejadorEvent() {
+		return(this.manejadorEvento);
+	}
+	
+	//Para settear el manejador para el evento
+	public void setManejadorEventListener (MensajeEventListener listener)
+    {
+		this.manejadorEvento = listener;
 	}
 	
 }
